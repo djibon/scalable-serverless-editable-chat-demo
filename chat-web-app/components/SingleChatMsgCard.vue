@@ -32,7 +32,7 @@
             ref="editMsgPara"
             @keydown.enter="saveEditedMsg()"
           >
-            {{ messageContents }}
+            {{ msgPayload.content }}
           </div>
         </div>
         <div

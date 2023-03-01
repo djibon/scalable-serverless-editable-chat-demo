@@ -4,9 +4,11 @@ export default {
   // init an ably realtime instance using token auth
   instantiateAbly(vueContext) {
     const ablyInstance = new Ably.Realtime({
-      authUrl:
-        "https://serverless-scalable-chat.netlify.app/.netlify/functions/ably-auth",
-      echoMessages: false
+      //authUrl:
+      //  "https://serverless-scalable-chat.netlify.app/.netlify/functions/ably-auth",
+      key: "awSpQA.rfWOzQ:KZMhtJ3kYf_3pi4sQtuRxSUlPX32YTx5JaFjqTjZ0cU",
+      clientId: " clientId-" + Math.random().toString(36).substr(2, 16),
+      echoMessages: true
     });
 
     // when ably is successfully connected, set state variables and call methods to attach to various channels and subscribe to the presence set
@@ -29,13 +31,49 @@ export default {
     );
 
     vueContext.commit("setAblyChannelInstances", { outgoingCh, incomingCh });
-
     vueContext.dispatch("subscribeToChannels");
   },
 
   // subscribe to the incoming and outgoing channel instances
-  subscribeToChannels({ commit, state }) {
-    state.channelInstances.incomingChat.subscribe(msg => {
+  subscribeToChannels(vueContext){
+    let commit = vueContext.commit;
+    let state = vueContext.state;
+
+    console.log("subscribing to channels");
+    console.log(vueContext);
+    
+    state.channelInstances.outgoingChat.subscribe(msg => {
+      console.log("listeing");
+      let msgPayload = msg.data;  
+      try {
+        msgPayload = JSON.parse(msg.data);
+      } catch (error) {
+        //emit nothing
+      }
+      
+      msgPayload["row"] = 20;
+      
+      let operationPerformed = msgPayload.type||"INSERT";
+
+      /* check if the update is about a new message being inserted or an existing message being edited */
+      if (operationPerformed == "INSERT") {
+        // set the update type to new, so we can scroll the message list to bottom
+        commit("setChatMsgArrayUpdateType", "new");
+        state.chatMessagesArray.push(msgPayload);
+      } else if (operationPerformed == "UPDATE") {
+        // set the update type to edit, find and update the array object with new data
+        commit("setChatMsgArrayUpdateType", "edit");
+        let msgObjToEdit = state.chatMessagesArray.find(
+          msg => msg.msg_id == msgPayload.row.msg_id
+        );
+        msgObjToEdit.msg_data = msgPayload.row.msg_data;
+        msgObjToEdit.is_edited = msgPayload.row.is_edited;
+      }
+    });
+  },
+
+  subscribeToChannels2({ commit, state }) {
+    state.channelInstances.outgoingChat.subscribe(msg => {
       let msgPayload = JSON.parse(msg.data);
       let operationPerformed = msgPayload.type;
 
@@ -58,6 +96,7 @@ export default {
 
   //subscribe to ably presence updates on the outgoing channel
   subscribeToAblyPresence(vueContext) {
+    
     this.state.channelInstances.outgoingChat.presence.subscribe(
       "enter",
       msg => {
@@ -81,6 +120,7 @@ export default {
         }
       }
     );
+    
   },
 
   // handle a new member entering the ably presence set
@@ -107,6 +147,7 @@ export default {
 
   // global method to publish a chat message on the outgoing channel instance
   publishMyChatMsgToAbly({ state }, chatMsg) {
+    console.log(state);
     state.channelInstances.outgoingChat.publish("chatMsg", {
       username: state.username,
       content: chatMsg
