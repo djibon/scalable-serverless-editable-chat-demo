@@ -8,7 +8,8 @@ exports.handler = (_event, _context, callback) => {
         "clientId-" +
         Math.random()
           .toString(36)
-          .substr(2, 16)
+          .substr(2, 16),
+      key: process.env.ABLY_API_KEY
     },
     (err, tokenRequest) => {
       if (err) {
@@ -30,4 +31,6 @@ exports.handler = (_event, _context, callback) => {
       }
     }
   );
+
+  
 };
