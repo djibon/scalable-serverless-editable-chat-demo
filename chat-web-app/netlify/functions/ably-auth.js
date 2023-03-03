@@ -10,7 +10,6 @@ exports.handler = (_event, _context, callback) => {
           .toString(36)
           .substr(2, 16)
     },
-    null,
     (err, tokenRequest) => {
       if (err) {
         callback({
