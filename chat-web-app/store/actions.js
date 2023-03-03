@@ -6,7 +6,6 @@ export default {
     const ablyInstance = new Ably.Realtime({
       authUrl:
         "https://illustrious-macaron-d933cc.netlify.app/.netlify/functions/ably-auth",
-      clientId: " clientId-" + Math.random().toString(36).substr(2, 16),
       echoMessages: true
     });
 
