@@ -1,5 +1,5 @@
 const Ably = require("ably");
-const rest = new Ably.Rest(process.env.ABLY_API_KEY );
+const rest = new Ably.Rest({key: process.env.ABLY_API_KEY });
 
 exports.handler = (_event, _context, callback) => {
   rest.auth.createTokenRequest(
@@ -9,7 +9,6 @@ exports.handler = (_event, _context, callback) => {
         Math.random()
           .toString(36)
           .substr(2, 16),
-      key: process.env.ABLY_API_KEY
     },
     (err, tokenRequest) => {
       if (err) {
