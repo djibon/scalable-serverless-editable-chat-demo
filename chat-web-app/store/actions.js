@@ -4,9 +4,8 @@ export default {
   // init an ably realtime instance using token auth
   instantiateAbly(vueContext) {
     const ablyInstance = new Ably.Realtime({
-      //authUrl:
-      //  "https://serverless-scalable-chat.netlify.app/.netlify/functions/ably-auth",
-      key: "awSpQA.rfWOzQ:KZMhtJ3kYf_3pi4sQtuRxSUlPX32YTx5JaFjqTjZ0cU",
+      authUrl:
+        "https://illustrious-macaron-d933cc.netlify.app/.netlify/functions/ably-auth",
       clientId: " clientId-" + Math.random().toString(36).substr(2, 16),
       echoMessages: true
     });
