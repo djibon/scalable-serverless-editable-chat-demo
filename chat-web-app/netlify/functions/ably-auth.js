@@ -8,8 +8,9 @@ exports.handler = (_event, _context, callback) => {
         "clientId-" +
         Math.random()
           .toString(36)
-          .substr(2, 16),
+          .substr(2, 16)
     },
+    null,
     (err, tokenRequest) => {
       if (err) {
         callback({
